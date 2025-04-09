@@ -19,7 +19,7 @@ public class RepoManager {
     private final DeviceRepo deviceRepo;
 
 
-    public void init() throws SQLException {
+    public static void init() throws SQLException {
         instance = new RepoManager();
     }
 

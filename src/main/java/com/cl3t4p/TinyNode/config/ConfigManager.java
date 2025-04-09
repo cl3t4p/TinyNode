@@ -7,13 +7,15 @@ import java.io.File;
 import java.io.IOException;
 
 
+
 public class ConfigManager {
 
     @Getter
     private static ConfigManager instance;
 
-    public static void init(File config_file) throws IOException {
+    public static ConfigManager init(File config_file) throws IOException {
         instance = new ConfigManager(config_file);
+        return instance;
     }
 
     @Getter
@@ -22,6 +24,5 @@ public class ConfigManager {
     private ConfigManager(File config_file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         config = mapper.readValue(config_file,ConfigFile.class);
-
     }
 }

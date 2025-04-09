@@ -3,7 +3,6 @@ package com.cl3t4p.TinyNode.db.impl;
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.mapper.SQLMapper;
 import com.cl3t4p.TinyNode.devices.SimpleDevice;
-import com.cl3t4p.TinyNode.routes.DevicesRoute;
 
 import java.io.ByteArrayInputStream;
 import java.sql.*;
@@ -45,13 +44,12 @@ public class DeviceRepoSQLite implements DeviceRepo {
 
 
     @Override
-    public byte[] getAESKeyByID(String id) throws SQLException {
+    public SimpleDevice getDeviceByID(String id) throws SQLException {
         try(var conn = getConnection()){
-            var statement = conn.prepareStatement("SELECT aes_key FROM `devices` WHERE id=?");
+            var statement = conn.prepareStatement("SELECT * FROM `devices` WHERE id=?");
             statement.setString(1,id);
-            var query = statement.executeQuery();
-            Blob blob = query.getBlob(1);
-            return blob.getBytes(0,32);
+            var resultSet = statement.executeQuery();
+            return SQLMapper.deserializeSQL(resultSet,SimpleDevice.class);
         }
     }
     @Override
@@ -102,4 +100,7 @@ public class DeviceRepoSQLite implements DeviceRepo {
         }
         return devices;
     }
+
+
+
 }

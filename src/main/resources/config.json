@@ -1,12 +1,8 @@
 {
   "ip_grabber" : "https://api4.ipify.org/",
-  "private_key" : "wlms2lN4So1Z2ULUnC5Eyil6iafA9W1d+C7Hy0OvwTk=",
+  "shared_key" : "wlms2lN4So1Z2ULUnC5Eyil6iafA9W1d+C7Hy0OvwTk=",
   "db": {
     "db_type" : "SQLite",
     "url" : "jdbc:sqlite:data/sqlite.db"
-  },
-  "mqtt": {
-    "client_id" : "019617d7-6b48-761d-ae73-0b4e44b06b24",
-    "url" : "tcp://127.0.0.1:1883"
   }
 }

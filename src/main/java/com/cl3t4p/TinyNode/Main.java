@@ -1,13 +1,15 @@
 package com.cl3t4p.TinyNode;
 
 
+
 import com.cl3t4p.TinyNode.config.ConfigManager;
-import com.cl3t4p.TinyNode.routes.IPHandler;
-import com.cl3t4p.TinyNode.routes.SimpleClientHandler;
+import com.cl3t4p.TinyNode.routes.APIHandler;
+import com.cl3t4p.TinyNode.routes.api.IPHandler;
 import com.cl3t4p.TinyNode.db.RepoManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.javalin.Javalin;
+import io.javalin.apibuilder.ApiBuilder;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.simple.SimpleLoggerFactory;
@@ -16,6 +18,7 @@ import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+
 
 
 public class Main {
@@ -42,27 +45,27 @@ public class Main {
         }
         //Setup config
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            cfgManager = mapper.readValue(new File(CONFIG_FOLDER,"config.json"),ConfigManager.class);
+            cfgManager = ConfigManager.init(new File(CONFIG_FOLDER,"config.json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        //Setup databases
-        RepoManager manager = RepoManager.getInstance();
 
+        //Setup database
         try {
-            manager.init();
+            RepoManager.init();
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
 
 
 
-
-        var app = Javalin.create()
-                .get("/",ctx -> ctx.result("Hello World"))
-                .get("/api/devices/ip",IPHandler::getCurrentIP);
+        var app = Javalin.create(config->{
+            config.router.apiBuilder(()->{
+                ApiBuilder.path("/api",APIHandler.getEndpoints());
+                ApiBuilder.get("/info", ctx -> ctx.result("hello"));
+            });
+        });
 
         app.start(7070);
 

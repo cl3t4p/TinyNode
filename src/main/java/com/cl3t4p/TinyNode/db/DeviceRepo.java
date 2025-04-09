@@ -13,7 +13,9 @@ public interface DeviceRepo {
 
     boolean modifyNameByID(String id,String name) throws SQLException;
 
-    byte[] getAESKeyByID(String id) throws SQLException;
+    SimpleDevice getDeviceByID(String id) throws SQLException;
 
     Set<SimpleDevice> getAllDevices() throws SQLException;
+
+
 }

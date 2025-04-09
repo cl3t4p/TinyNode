@@ -1,8 +1,10 @@
-package com.cl3t4p.TinyNode.routes;
+package com.cl3t4p.TinyNode.routes.api;
 
 import com.cl3t4p.TinyNode.config.ConfigFile;
 import com.cl3t4p.TinyNode.config.ConfigManager;
+import com.cl3t4p.TinyNode.routes.APIHandler;
 import com.cl3t4p.TinyNode.tools.AESTools;
+import io.javalin.apibuilder.ApiBuilder;
 import io.javalin.http.Context;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -24,26 +26,31 @@ public class IPHandler {
 
     private static String IP = null;
 
+
+    public static void getEndpoints() {
+        IPHandler ipHandler = new IPHandler();
+        ApiBuilder.get("/", ipHandler::getCurrentIP);
+    }
+
+
+
     public IPHandler(){
         try(ScheduledExecutorService exec = Executors.newScheduledThreadPool(1)) {
             exec.scheduleAtFixedRate(new IPGrabber() , 0, 1, TimeUnit.MINUTES);
         }
     }
 
-
     /**
      * Get the current public ip of the machine encrypted with the shared aes key
      */
-    public static void getCurrentIP(@NotNull Context ctx) {
+    public void getCurrentIP(@NotNull Context ctx) {
         if (IP == null){
             ctx.status(HttpStatus.UNAUTHORIZED_401);
         }else{
-            String key = ConfigManager.getInstance().getConfig().getKey();
+            String key = ConfigManager.getInstance().getConfig().getShared_key();
             ctx.result(AESTools.encrypt(IP,key));
         }
     }
-
-
 
     public static class IPGrabber implements Runnable{
 
