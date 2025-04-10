@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 
 /**
- * This annotation is used to represent a table name in the database or ignore a field.
+ * SQLDInfo - An annotation to provide metadata for SQL Mapping.
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

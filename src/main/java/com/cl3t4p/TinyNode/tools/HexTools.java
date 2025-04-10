@@ -1,7 +1,8 @@
 package com.cl3t4p.TinyNode.tools;
 
-import java.util.Arrays;
-
+/**
+ * HexTools - A utility class for encoding and decoding byte arrays to and from hexadecimal strings.
+ */
 public class HexTools {
 
     private static final char[] HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

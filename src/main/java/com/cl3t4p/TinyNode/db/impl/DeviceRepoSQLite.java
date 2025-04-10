@@ -7,6 +7,7 @@ import com.cl3t4p.TinyNode.devices.SimpleDevice;
 import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DeviceRepoSQLite implements DeviceRepo {
@@ -21,12 +22,13 @@ public class DeviceRepoSQLite implements DeviceRepo {
                 CREATE TABLE IF NOT EXISTS `devices` (
                   `id` TEXT NOT NULL,
                   `name` TEXT NULL,
-                  `aes_key` BLOB NULL,
+                  `aes_key` TEXT NULL,
                   PRIMARY KEY (`id`)
                 )
                 """;
         try (var conn = getConnection()) {
-            conn.prepareStatement(table_creation);
+            var sta = conn.prepareStatement(table_creation);
+            sta.executeUpdate();
         }
     }
 
@@ -55,20 +57,20 @@ public class DeviceRepoSQLite implements DeviceRepo {
     @Override
     public boolean addDevice(String id,byte[] key) throws SQLException{
         try(var conn = getConnection()){
-            var statement = conn.prepareStatement("INSERT INTO `devices` (id,aes_key) VALUES (?,?)");
+            var statement = conn.prepareStatement("INSERT INTO `devices` (id,aes_key,name) VALUES (?,?,?)");
             statement.setString(1,id);
             statement.setBlob(2,new ByteArrayInputStream(key));
+            statement.setString(3,id);
             int result = statement.executeUpdate();
             return result == 1;
         }
     }
+
     @Override
-    public boolean addDevice(String id,byte[] key,String name) throws SQLException{
+    public boolean addDevice(SimpleDevice device) throws SQLException {
         try(var conn = getConnection()){
             var statement = conn.prepareStatement("INSERT INTO `devices` (id,aes_key,name) VALUES (?,?,?)");
-            statement.setString(1,id);
-            statement.setBlob(2,new ByteArrayInputStream(key));
-            statement.setString(3,name);
+            SQLMapper.serializeSQL(statement,device, List.of("id","aes_key","name"));
             int result = statement.executeUpdate();
             return result == 1;
         }

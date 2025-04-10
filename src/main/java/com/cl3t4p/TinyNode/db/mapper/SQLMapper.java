@@ -11,9 +11,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * SQLMapper - A utility class for serializing and deserializing objects to and from SQL.
+ */
 public class SQLMapper {
 
 
+    /**
+     * Serializes an object into a SQL PreparedStatement.
+     *
+     * @param statement The PreparedStatement to serialize the object into.
+     * @param object    The object to serialize.
+     * @param fields    The list of field names to serialize.
+     * @param <A>       The type of the object.
+     * @throws SQLException If an SQL error occurs during serialization.
+     */
     public static <A> void serializeSQL(PreparedStatement statement, A object, List<String> fields) throws SQLException {
         try {
             int cursor = 0;
@@ -24,7 +36,6 @@ public class SQLMapper {
                 cursor++;
                 field.setAccessible(true);
 
-                //TODO test byte[] to blob
                 statement.setObject(cursor,field.get(object));
             }
 
@@ -35,7 +46,19 @@ public class SQLMapper {
 
 
 
+    /**
+     * Deserializes a SQL ResultSet into an object of the specified class.
+     *
+     * @param result The ResultSet to deserialize.
+     * @param clazz  The class of the object to deserialize into.
+     * @param <A>    The type of the object.
+     * @return The deserialized object or null if there is no object
+     * @throws SQLException If an SQL error occurs during deserialization.
+     */
     public static <A> A deserializeSQL(ResultSet result, Class<A> clazz) throws SQLException {
+        if(!result.isBeforeFirst()){
+            return null;
+        }
         A object;
 
         try {
@@ -55,7 +78,6 @@ public class SQLMapper {
 
                 field.setAccessible(true);
 
-                //TODO test blob to byte[]
                 field.set(object, result.getObject(name));
             }
         }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e){

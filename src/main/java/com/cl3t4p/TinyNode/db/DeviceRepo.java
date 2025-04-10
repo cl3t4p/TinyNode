@@ -7,9 +7,10 @@ import java.util.Set;
 
 public interface DeviceRepo {
 
+
     boolean addDevice(String id,byte[] key) throws SQLException;
 
-    boolean addDevice(String id,byte[] key,String name) throws SQLException;
+    boolean addDevice(SimpleDevice device) throws SQLException;
 
     boolean modifyNameByID(String id,String name) throws SQLException;
 

@@ -1,5 +1,6 @@
 package com.cl3t4p.TinyNode.routes.api;
 
+import com.cl3t4p.TinyNode.TinyNode;
 import com.cl3t4p.TinyNode.config.ConfigFile;
 import com.cl3t4p.TinyNode.config.ConfigManager;
 import com.cl3t4p.TinyNode.routes.APIHandler;
@@ -41,14 +42,14 @@ public class IPHandler {
     }
 
     /**
-     * Get the current public ip of the machine encrypted with the shared aes key
+     * Retrieves the current IP address from the IP grabber URL and encrypts it using AES shared key.
+     * If the IP address is not available, it returns a 401 Unauthorized status.
      */
     public void getCurrentIP(@NotNull Context ctx) {
         if (IP == null){
             ctx.status(HttpStatus.UNAUTHORIZED_401);
         }else{
-            String key = ConfigManager.getInstance().getConfig().getShared_key();
-            ctx.result(AESTools.encrypt(IP,key));
+            ctx.result(AESTools.encrypt(IP, TinyNode.getGlobalSecretKey()));
         }
     }
 

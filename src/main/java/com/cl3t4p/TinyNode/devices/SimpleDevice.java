@@ -2,20 +2,23 @@ package com.cl3t4p.TinyNode.devices;
 
 import com.cl3t4p.TinyNode.tools.AESTools;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.crypto.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class SimpleDevice {
 
 
-    private final String id;
+    private String id;
     private String name;
-    private byte[] encodedKey;
+    private String aes_key;
 
 
     public SimpleDevice(String id) throws NoSuchAlgorithmException {
@@ -23,17 +26,25 @@ public class SimpleDevice {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(256);
         SecretKey secretKey = keyGen.generateKey();
-        encodedKey = secretKey.getEncoded();
+        aes_key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
 
+    public byte[] getAes_key() {
+        return Base64.getDecoder().decode(aes_key);
+    }
 
+    /**
+     * Encrypts the given data using the AES algorithm and the device's key.
+     * @param data The data to encrypt.
+     * @return The encrypted data as a base64 encoded string.
+     */
     public String encrypt(String data) {
-        return AESTools.encrypt(data, encodedKey);
+        return AESTools.encrypt(data, getAes_key());
     }
 
-
+    
     public String decrypt(String data) {
-        return AESTools.decrypt(data, encodedKey);
+        return AESTools.decrypt(data, getAes_key());
     }
 }

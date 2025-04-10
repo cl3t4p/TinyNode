@@ -15,13 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.simple.SimpleLoggerFactory;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Base64;
 
 
-
-public class Main {
+public class TinyNode {
 
     private static final Logger logger = new SimpleLoggerFactory().getLogger(IPHandler.class.getSimpleName());
 
@@ -33,6 +34,9 @@ public class Main {
 
     @Getter
     private static ConfigManager cfgManager;
+
+    @Getter
+    private static Javalin app;
 
     public static void main(String[] args) {
 
@@ -50,6 +54,10 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+        //Setup shared aes key
+        byte[] encodedKey = Base64.getDecoder().decode(cfgManager.getConfig().getShared_key());
+        globalSecretKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+
 
         //Setup database
         try {
@@ -58,23 +66,17 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-
-
-        var app = Javalin.create(config->{
+        app = Javalin.create(config->{
             config.router.apiBuilder(()->{
                 ApiBuilder.path("/api",APIHandler.getEndpoints());
                 ApiBuilder.get("/info", ctx -> ctx.result("hello"));
             });
         });
 
-        app.start(7070);
-
+        app.start(cfgManager.getConfig().getPort());
     }
 
 
 
-    private static void createFolder(){
-
-    }
 
 }
