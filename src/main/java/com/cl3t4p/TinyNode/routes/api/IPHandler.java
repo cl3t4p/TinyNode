@@ -53,6 +53,10 @@ public class IPHandler {
         }
     }
 
+    /**
+     * IPGrabber - A class that retrieves the current IP address from a specified URL.
+     * It implements the Runnable interface to be used in a scheduled executor service.
+     */
     public static class IPGrabber implements Runnable{
 
         private final URL ip_grabber_url;

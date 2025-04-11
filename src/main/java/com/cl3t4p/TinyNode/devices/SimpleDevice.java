@@ -44,6 +44,11 @@ public class SimpleDevice {
     }
 
     
+    /**
+     * Decrypts the given data using the AES algorithm and the device's key.
+     * @param data The data to decrypt.
+     * @return The decrypted data as a string.
+     */
     public String decrypt(String data) {
         return AESTools.decrypt(data, getAes_key());
     }

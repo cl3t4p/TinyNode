@@ -79,6 +79,7 @@ public class WSDeviceHandler implements WsCloseHandler, WsConnectHandler, WsErro
             //Get the device ID from the repository
             SimpleDevice device = deviceRepo.getDeviceByID(mac_hex);
 
+
             if (device == null){
                 //New device logic here
                 device = new SimpleDevice(mac_hex);
@@ -100,8 +101,7 @@ public class WSDeviceHandler implements WsCloseHandler, WsConnectHandler, WsErro
     }
 
     @Override
-    public void handleBinaryMessage(@NotNull WsBinaryMessageContext wsBinaryMessageContext) {
-    }
+    public void handleBinaryMessage(@NotNull WsBinaryMessageContext wsBinaryMessageContext) {}
 
     @Override
     public void handleError(@NotNull WsErrorContext wsErrorContext) {
@@ -115,14 +115,21 @@ public class WSDeviceHandler implements WsCloseHandler, WsConnectHandler, WsErro
 
 
 
+
     /**
-     * Simulates a mirrored HashMap for active sessions.
+     * MirroredSession - A class that manages the mapping between device IDs and their associated WebSocket contexts.
+     * It provides methods to add, remove, and retrieve devices and their contexts based on device ID or session ID.
      */
     private static class MirroredSession{
         HashMap<String, Pair<SimpleDevice,WsContext>> activeSessions = new HashMap<>();
         HashMap<String, Pair<SimpleDevice,WsContext>> mirrorActiveSession = new HashMap<>();
 
 
+        /**
+         * Adds a device and its associated WebSocket context to the session map.
+         * @param device The SimpleDevice object to be added.
+         * @param context The WebSocket context associated with the device.
+         */
         private void add(@NotNull SimpleDevice device, WsContext context){
             var pair = new Pair<>(device,context);
             activeSessions.put(device.getId(),pair);
@@ -138,6 +145,7 @@ public class WSDeviceHandler implements WsCloseHandler, WsConnectHandler, WsErro
             String session_id = activeSessions.remove(device_id).component1().getId();
             mirrorActiveSession.remove(session_id);
         }
+
 
         private Pair<SimpleDevice,WsContext> getByDeviceID(String device_id){
             return activeSessions.get(device_id);

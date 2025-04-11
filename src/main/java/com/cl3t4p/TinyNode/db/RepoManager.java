@@ -8,7 +8,10 @@ import lombok.Getter;
 import java.sql.SQLException;
 
 
-
+/**
+ * RepoManager - A singleton class to manage database repositories.
+ * It initializes the appropriate repository based on the configuration.
+ */
 public class RepoManager {
 
     @Getter
