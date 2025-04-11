@@ -2,7 +2,6 @@ package com.cl3t4p.TinyNode.annotation;
 
 import java.lang.annotation.*;
 
-
 /**
  * SQLDInfo - An annotation to provide metadata for SQL Mapping.
  */
