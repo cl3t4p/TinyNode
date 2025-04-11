@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class ConfigFile {
-    Integer port;
-    String ip_grabber;
-    String shared_key;
-    DatabaseConfig db;
+  Integer port;
+  String ip_grabber;
+  String shared_key;
+  DatabaseConfig db;
 }

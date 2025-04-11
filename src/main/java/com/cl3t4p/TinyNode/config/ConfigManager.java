@@ -1,11 +1,9 @@
 package com.cl3t4p.TinyNode.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-
 import java.io.File;
 import java.io.IOException;
-
+import lombok.Getter;
 
 public class ConfigManager {
 

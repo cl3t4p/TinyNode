@@ -3,7 +3,6 @@ package com.cl3t4p.TinyNode.db.impl;
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.mapper.SQLMapper;
 import com.cl3t4p.TinyNode.devices.SimpleDevice;
-
 import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.HashSet;
@@ -12,9 +11,8 @@ import java.util.Set;
 
 public class DeviceRepoSQLite implements DeviceRepo {
 
-    private Connection conn = null;
     private final String uri;
-
+  private Connection conn = null;
 
     public DeviceRepoSQLite(String uri) throws SQLException {
         this.uri = uri;

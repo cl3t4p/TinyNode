@@ -5,7 +5,7 @@ import org.slf4j.simple.SimpleLoggerFactory;
 
 public class LoggerFactory {
 
-    public static Logger getLogger(Class<?> clazz){
-        return new SimpleLoggerFactory().getLogger(clazz.getSimpleName());
-    }
+  public static Logger getLogger(Class<?> clazz) {
+    return new SimpleLoggerFactory().getLogger(clazz.getSimpleName());
+  }
 }

@@ -2,16 +2,9 @@ package com.cl3t4p.TinyNode.routes.api;
 
 import com.cl3t4p.TinyNode.TinyNode;
 import com.cl3t4p.TinyNode.config.ConfigFile;
-import com.cl3t4p.TinyNode.config.ConfigManager;
-import com.cl3t4p.TinyNode.routes.APIHandler;
 import com.cl3t4p.TinyNode.tools.AESTools;
 import io.javalin.apibuilder.ApiBuilder;
 import io.javalin.http.Context;
-import org.eclipse.jetty.http.HttpStatus;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.simple.SimpleLoggerFactory;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -20,6 +13,10 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.eclipse.jetty.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.simple.SimpleLoggerFactory;
 
 public class IPHandler {
 
@@ -27,18 +24,15 @@ public class IPHandler {
 
     private static String IP = null;
 
+  public IPHandler() {
+    try (ScheduledExecutorService exec = Executors.newScheduledThreadPool(1)) {
+      exec.scheduleAtFixedRate(new IPGrabber(), 0, 1, TimeUnit.MINUTES);
+    }
+  }
 
     public static void getEndpoints() {
         IPHandler ipHandler = new IPHandler();
         ApiBuilder.get("/", ipHandler::getCurrentIP);
-    }
-
-
-
-    public IPHandler(){
-        try(ScheduledExecutorService exec = Executors.newScheduledThreadPool(1)) {
-            exec.scheduleAtFixedRate(new IPGrabber() , 0, 1, TimeUnit.MINUTES);
-        }
     }
 
     /**
