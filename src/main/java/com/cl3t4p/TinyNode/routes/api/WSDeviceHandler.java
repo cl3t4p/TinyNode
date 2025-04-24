@@ -3,14 +3,17 @@ package com.cl3t4p.TinyNode.routes.api;
 import com.cl3t4p.TinyNode.TinyNode;
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.RepoManager;
-import com.cl3t4p.TinyNode.devices.SimpleDevice;
+import com.cl3t4p.TinyNode.model.SimpleDevice;
 import com.cl3t4p.TinyNode.tools.AESTools;
 import com.cl3t4p.TinyNode.tools.HexTools;
 import io.javalin.websocket.*;
 import java.io.ByteArrayInputStream;
 import java.nio.channels.ClosedChannelException;
+import java.util.Base64;
 import java.util.HashMap;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.spec.IvParameterSpec;
+
 import kotlin.Pair;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +26,8 @@ public class WSDeviceHandler
   private static final Logger LOGGER =
       new SimpleLoggerFactory().getLogger(WSDeviceHandler.class.getSimpleName());
 
-  @Getter private static WSDeviceHandler instance;
+  @Getter
+  private static WSDeviceHandler instance;
 
   private final DeviceRepo deviceRepo = RepoManager.getInstance().getDeviceRepo();
   private final MirroredSession sessionMap = new MirroredSession();
@@ -48,9 +52,7 @@ public class WSDeviceHandler
     var pair = sessionMap.getByDeviceID(device_id);
     SimpleDevice device = pair.component1();
     WsContext ctx = pair.component2();
-
-    long random = System.currentTimeMillis();
-    String enc_data = device.encrypt(message + random);
+    String enc_data = device.encrypt(message,AESTools.getRandomIv());
     ctx.send(enc_data);
   }
 
@@ -61,16 +63,20 @@ public class WSDeviceHandler
    */
   @Override
   public void handleConnect(@NotNull WsConnectContext wsCnt) throws Exception {
-    // Get the encrypted device ID from the cookies
 
+
+    String iv_param = wsCnt.cookie("iv");
     String str_code = wsCnt.cookie("code");
-    if (str_code == null) {
+    if (str_code == null || iv_param == null) {
       wsCnt.closeSession();
       return;
     }
+
+    IvParameterSpec iv = new IvParameterSpec(Base64.getDecoder().decode(iv_param));
     try (var bai =
         new ByteArrayInputStream(
-            AESTools.decryptToByteFromBase64(str_code, TinyNode.getGlobalSecretKey()))) {
+            AESTools.decryptFromBase64ToByte(str_code, TinyNode.getGlobalSecretKey(),iv))) {
+
 
       String mac_hex = HexTools.encode(bai.readNBytes(6));
       LOGGER.info("New device connected: {}", mac_hex);
@@ -79,10 +85,16 @@ public class WSDeviceHandler
       SimpleDevice device = deviceRepo.getDeviceByID(mac_hex);
 
       if (device == null) {
+        // Close connection if device is not present
+
+        wsCnt.closeSession();
+        return;
+        /*
         // New device logic here
         device = new SimpleDevice(mac_hex);
         device.setName(mac_hex);
         deviceRepo.addDevice(device);
+         */
       }
 
       sessionMap.add(device, wsCnt);

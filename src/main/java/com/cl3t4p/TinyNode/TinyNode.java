@@ -67,6 +67,9 @@ public class TinyNode {
                   });
             });
 
+    //TODO Remove after testing
+    //app.error(404,ctx -> ctx.result(""));
+
     app.start(cfgManager.getConfig().getPort());
   }
 }

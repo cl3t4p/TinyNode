@@ -43,7 +43,7 @@ public class IPHandler {
         if (IP == null){
             ctx.status(HttpStatus.UNAUTHORIZED_401);
         }else{
-            ctx.result(AESTools.encrypt(IP, TinyNode.getGlobalSecretKey()));
+            ctx.result(AESTools.encryptFromByteToBase64(IP.getBytes(), TinyNode.getGlobalSecretKey(),AESTools.getRandomIv()));
         }
     }
 

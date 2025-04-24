@@ -2,7 +2,7 @@ package com.cl3t4p.TinyNode.db.impl;
 
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.mapper.SQLMapper;
-import com.cl3t4p.TinyNode.devices.SimpleDevice;
+import com.cl3t4p.TinyNode.model.SimpleDevice;
 import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.HashSet;

@@ -1,6 +1,6 @@
 package com.cl3t4p.TinyNode.db;
 
-import com.cl3t4p.TinyNode.devices.SimpleDevice;
+import com.cl3t4p.TinyNode.model.SimpleDevice;
 import java.sql.SQLException;
 import java.util.Set;
 

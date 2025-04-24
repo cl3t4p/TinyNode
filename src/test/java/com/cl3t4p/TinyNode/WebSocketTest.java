@@ -29,14 +29,14 @@ public class WebSocketTest {
   public void testWebSocketEcho() throws Exception {
     CompletableFuture<String> receivedMessage = new CompletableFuture<>();
 
+
     String mac_address = "5cb6037f7fa6";
     HttpClient client = HttpClient.newHttpClient();
-    long random = System.currentTimeMillis();
     var bao = ByteBuffer.allocate(6 + Long.BYTES);
     bao.put(HexTools.decode(mac_address));
-    bao.putLong(random);
 
-    String code = AESTools.encryptToBase64FromByte(bao.array(), cfg.getShared_key());
+
+    String code = AESTools.encryptFromByteToBase64(bao.array(), cfg.getShared_key());
 
     WebSocket webSocket =
         client
@@ -46,6 +46,7 @@ public class WebSocketTest {
                 URI.create("ws://localhost:7070" + API_BASE_PATH + "/device/com"),
                 new WebSocket.Listener() {})
             .join();
+
 
     var stat = webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "");
     stat.join();

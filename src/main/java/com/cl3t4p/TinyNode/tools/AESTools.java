@@ -1,11 +1,18 @@
 package com.cl3t4p.TinyNode.tools;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
 import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.IvParameterSpec;
+
+import com.cl3t4p.TinyNode.config.ConfigFile;
+import com.cl3t4p.TinyNode.config.ConfigManager;
 import org.jetbrains.annotations.NotNull;
+
+
 
 /**
  * AESTools - A utility class for AES encryption and decryption.
@@ -16,105 +23,47 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AESTools {
 
-  public static String encrypt(String data, byte[] encodedKey) {
-    try {
-      SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.ENCRYPT_MODE, originalKey);
-      byte[] cipherText = cipher.doFinal(data.getBytes());
-      return Base64.getEncoder().encodeToString(cipherText);
 
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | NoSuchPaddingException
-        | IllegalBlockSizeException
-        | BadPaddingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static String encryptToBase64FromByte(byte[] data, String base64key) {
+  public static String encryptFromByteToBase64(byte[] data,@NotNull SecretKey key, IvParameterSpec ivParam) {
     try {
-      byte[] encodedKey = Base64.getDecoder().decode(base64key);
-      SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.ENCRYPT_MODE, originalKey);
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+      cipher.init(Cipher.ENCRYPT_MODE, key,ivParam);
       byte[] cipherText = cipher.doFinal(data);
-      return Base64.getEncoder().encodeToString(cipherText);
+      byte[] full_msg = new byte[data.length + ivParam.getIV().length];
+      //Add iv to the first
+      System.arraycopy(ivParam.getIV(), 0, full_msg, 0, ivParam.getIV().length);
+      //Add encrypted data
+      System.arraycopy(cipherText, 0, full_msg, ivParam.getIV().length, cipherText.length);
+      return Base64.getEncoder().encodeToString(full_msg);
 
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | NoSuchPaddingException
-        | IllegalBlockSizeException
-        | BadPaddingException e) {
+    } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+      //TODO Handle stuff here
       throw new RuntimeException(e);
     }
   }
 
-  public static String encrypt(String data, SecretKey originalKey) {
-    try {
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.ENCRYPT_MODE, originalKey);
-      byte[] cipherText = cipher.doFinal(data.getBytes());
-      return Base64.getEncoder().encodeToString(cipherText);
 
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | NoSuchPaddingException
-        | IllegalBlockSizeException
-        | BadPaddingException e) {
+  public static byte[] decryptFromBase64ToByte(String data, @NotNull SecretKey originalKey,IvParameterSpec ivParam)
+          throws IllegalBlockSizeException
+  {
+    try {
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+      cipher.init(Cipher.DECRYPT_MODE, originalKey ,ivParam);
+      return cipher.doFinal(Base64.getDecoder().decode(data));
+
+    } catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | NoSuchPaddingException |
+             InvalidAlgorithmParameterException | IllegalBlockSizeException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static String decrypt(String data, byte[] encodedKey) {
-    try {
-      SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.DECRYPT_MODE, originalKey);
-      byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(data));
-      return new String(plainText);
 
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | IllegalBlockSizeException
-        | BadPaddingException
-        | NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static String decrypt(String data, @NotNull String base64key) {
-    try {
-      byte[] encodedKey = Base64.getDecoder().decode(base64key);
-      SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.DECRYPT_MODE, originalKey);
-      byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(data));
-      return new String(plainText);
-
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | IllegalBlockSizeException
-        | BadPaddingException
-        | NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static byte[] decryptToByteFromBase64(String data, @NotNull SecretKey originalKey)
-      throws IllegalBlockSizeException {
-    try {
-      Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(Cipher.DECRYPT_MODE, originalKey);
-      byte[] decoded_data = cipher.doFinal(Base64.getDecoder().decode(data));
-      return decoded_data;
-
-    } catch (InvalidKeyException
-        | NoSuchAlgorithmException
-        | BadPaddingException
-        | NoSuchPaddingException e) {
-      throw new RuntimeException(e);
-    }
+  public static IvParameterSpec getRandomIv() {
+    SecureRandom randomSecureRandom = new SecureRandom();
+    byte[] iv = new byte[16];
+    randomSecureRandom.nextBytes(iv);
+    return new IvParameterSpec(iv);
   }
 }
