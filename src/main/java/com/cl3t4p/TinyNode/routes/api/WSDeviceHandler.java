@@ -13,7 +13,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.IvParameterSpec;
-
 import kotlin.Pair;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +21,8 @@ import org.slf4j.simple.SimpleLoggerFactory;
 
 public class WSDeviceHandler
     implements WsCloseHandler, WsConnectHandler, WsErrorHandler, WsBinaryMessageHandler {
+
+
 
   private static final Logger LOGGER =
       new SimpleLoggerFactory().getLogger(WSDeviceHandler.class.getSimpleName());
@@ -64,8 +65,9 @@ public class WSDeviceHandler
   @Override
   public void handleConnect(@NotNull WsConnectContext wsCnt) throws Exception {
 
-
+    LOGGER.info("client connected");
     String iv_param = wsCnt.cookie("iv");
+    wsCnt.cookieMap();
     String str_code = wsCnt.cookie("code");
     if (str_code == null || iv_param == null) {
       wsCnt.closeSession();

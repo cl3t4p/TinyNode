@@ -7,12 +7,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-
-import com.cl3t4p.TinyNode.config.ConfigFile;
-import com.cl3t4p.TinyNode.config.ConfigManager;
 import org.jetbrains.annotations.NotNull;
-
-
 
 /**
  * AESTools - A utility class for AES encryption and decryption.
@@ -51,6 +46,7 @@ public class AESTools {
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 
       cipher.init(Cipher.DECRYPT_MODE, originalKey ,ivParam);
+      System.out.println(data);
       return cipher.doFinal(Base64.getDecoder().decode(data));
 
     } catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | NoSuchPaddingException |

@@ -65,6 +65,7 @@ public class TinyNode {
                     ApiBuilder.path("/api", APIHandler.getEndpoints());
                     ApiBuilder.get("/info", ctx -> ctx.result("hello"));
                   });
+              config.jetty.defaultHost = "0.0.0.0";
             });
 
     //TODO Remove after testing
