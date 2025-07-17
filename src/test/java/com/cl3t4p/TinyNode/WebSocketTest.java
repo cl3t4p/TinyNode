@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import lombok.SneakyThrows;
 import org.junit.Before;
@@ -35,8 +36,9 @@ public class WebSocketTest {
     var bao = ByteBuffer.allocate(6 + Long.BYTES);
     bao.put(HexTools.decode(mac_address));
 
-
-    String code = AESTools.encryptFromByteToBase64(bao.array(), cfg.getShared_key());
+    String code =
+        AESTools.encryptFromByteToBase64(
+            bao.array(), Base64.getDecoder().decode(cfg.getShared_key()));
 
     WebSocket webSocket =
         client

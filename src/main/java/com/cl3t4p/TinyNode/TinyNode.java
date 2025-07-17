@@ -10,8 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Base64;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.simple.SimpleLoggerFactory;
@@ -24,13 +22,14 @@ public class TinyNode {
   private static final File CONFIG_FOLDER = new File("config");
   private static final File DATA_FOLDER = new File("data");
 
-  @Getter private static SecretKey globalSecretKey;
+  @Getter private static byte[] globalSecretKey;
 
   @Getter private static ConfigManager cfgManager;
 
   @Getter private static Javalin app;
 
   public static void main(String[] args) {
+
 
     // Setup folders
     if (!CONFIG_FOLDER.exists()) {
@@ -47,8 +46,7 @@ public class TinyNode {
     }
 
     // Setup shared aes key
-    byte[] encodedKey = Base64.getDecoder().decode(cfgManager.getConfig().getShared_key());
-    globalSecretKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+    globalSecretKey = Base64.getDecoder().decode(cfgManager.getConfig().getShared_key());
 
     // Setup database
     try {

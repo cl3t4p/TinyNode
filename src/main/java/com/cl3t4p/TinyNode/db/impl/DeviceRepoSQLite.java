@@ -16,11 +16,12 @@ public class DeviceRepoSQLite implements DeviceRepo {
 
     public DeviceRepoSQLite(String uri) throws SQLException {
         this.uri = uri;
-        String table_creation = """
+    String table_creation =
+        """
                 CREATE TABLE IF NOT EXISTS `devices` (
                   `id` TEXT NOT NULL,
                   `name` TEXT NULL,
-                  `aes_key` TEXT NULL,
+                  `private_key` BLOB NOT NULL CHECK (length(private_key) = 32),
                   PRIMARY KEY (`id`)
                 )
                 """;
@@ -55,7 +56,8 @@ public class DeviceRepoSQLite implements DeviceRepo {
     @Override
     public boolean addDevice(String id,byte[] key) throws SQLException{
         try(var conn = getConnection()){
-            var statement = conn.prepareStatement("INSERT INTO `devices` (id,aes_key,name) VALUES (?,?,?)");
+      var statement =
+          conn.prepareStatement("INSERT INTO `devices` (id,private_key,name) VALUES (?,?,?)");
             statement.setString(1,id);
             statement.setBlob(2,new ByteArrayInputStream(key));
             statement.setString(3,id);
@@ -67,8 +69,9 @@ public class DeviceRepoSQLite implements DeviceRepo {
     @Override
     public boolean addDevice(SimpleDevice device) throws SQLException {
         try(var conn = getConnection()){
-            var statement = conn.prepareStatement("INSERT INTO `devices` (id,aes_key,name) VALUES (?,?,?)");
-            SQLMapper.serializeSQL(statement,device, List.of("id","aes_key","name"));
+      var statement =
+          conn.prepareStatement("INSERT INTO `devices` (id,private_key,name) VALUES (?,?,?)");
+      SQLMapper.serializeSQL(statement, device, List.of("id", "private_key", "name"));
             int result = statement.executeUpdate();
             return result == 1;
         }
