@@ -8,6 +8,8 @@ import io.javalin.Javalin;
 import io.javalin.apibuilder.ApiBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Base64;
 import lombok.Getter;
@@ -39,8 +41,14 @@ public class TinyNode {
       DATA_FOLDER.mkdirs();
     }
     // Setup config
+
     try {
-      cfgManager = ConfigManager.init(new File(CONFIG_FOLDER, "config.json"));
+      File config_file = new File(CONFIG_FOLDER, "config.json");
+      if (!config_file.exists()) {
+        URL url = TinyNode.class.getClassLoader().getResource("config.json");
+        Files.copy(url.openStream(), config_file.toPath());
+      }
+      cfgManager = ConfigManager.init(config_file);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -63,7 +71,7 @@ public class TinyNode {
                     ApiBuilder.path("/api", APIHandler.getEndpoints());
                     ApiBuilder.get("/info", ctx -> ctx.result("hello"));
                   });
-              config.jetty.defaultHost = "0.0.0.0";
+              config.jetty.defaultHost = cfgManager.getConfig().getIp();
             });
 
     //TODO Remove after testing

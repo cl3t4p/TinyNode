@@ -59,14 +59,14 @@ public class WSDeviceHandler
     String str_code = wsCnt.cookie("code");
 
     if (str_code == null) {
-      wsCnt.closeSession();
+      // wsCnt.closeSession();
       return;
     }
     // Get the device ID from the repository
     SimpleDevice device = deviceRepo.getDeviceByID(str_code);
     if (device == null) {
       // Close connection if device is not present
-      wsCnt.closeSession();
+      // wsCnt.closeSession();
       return;
     }
     sessionMap.add(device, wsCnt);
