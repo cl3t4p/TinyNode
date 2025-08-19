@@ -3,6 +3,7 @@ package com.cl3t4p.TinyNode.routes;
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 import com.cl3t4p.TinyNode.db.RepoManager;
+import com.cl3t4p.TinyNode.routes.api.CommandHandler;
 import com.cl3t4p.TinyNode.routes.api.WSDeviceHandler;
 import io.javalin.apibuilder.EndpointGroup;
 
@@ -23,6 +24,7 @@ public class APIHandler {
                         "/com/devices",
                         ctx -> ctx.json(RepoManager.getInstance().getDeviceRepo().getAllDevices()));
                     ws("/com", WSDeviceHandler::getEndpoints);
+                    post("/command", new CommandHandler());
                   });
             });
   }

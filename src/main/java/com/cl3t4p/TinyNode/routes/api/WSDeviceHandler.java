@@ -2,11 +2,10 @@ package com.cl3t4p.TinyNode.routes.api;
 
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.RepoManager;
-import com.cl3t4p.TinyNode.model.SimpleDevice;
+import com.cl3t4p.TinyNode.model.BaseDevice;
+import com.cl3t4p.TinyNode.tools.MirroredSession;
 import io.javalin.websocket.*;
 import java.nio.channels.ClosedChannelException;
-import java.util.HashMap;
-import kotlin.Pair;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -18,11 +17,14 @@ public class WSDeviceHandler
   private static final Logger LOGGER =
       new SimpleLoggerFactory().getLogger(WSDeviceHandler.class.getSimpleName());
 
+  private static final MirroredSession sessionMap =
+      RepoManager.getInstance().getDeviceSessionsMap();
+
   @Getter
   private static WSDeviceHandler instance;
 
   private final DeviceRepo deviceRepo = RepoManager.getInstance().getDeviceRepo();
-  private final MirroredSession sessionMap = new MirroredSession();
+
 
   public static void getEndpoints(WsConfig wsConfig) {
     instance = new WSDeviceHandler();
@@ -33,44 +35,32 @@ public class WSDeviceHandler
   }
 
   /**
-   * Sends a message to the device with the specified device ID. This method retrieves the device
-   * and its associated WebSocket context from the session map, encrypts the message using the
-   * device's encryption method, and sends it through the WebSocket context.
-   *
-   * @param device_id The ID of the device to send the message to.
-   * @param message The message to be sent to the device.
-   */
-  public void sendMessage(String device_id, String message) {
-    var pair = sessionMap.getByDeviceID(device_id);
-    SimpleDevice device = pair.component1();
-    WsContext ctx = pair.component2();
-    // String enc_data = device.encrypt(message,AESTools.getRandomIv());
-    // ctx.send(enc_data);
-  }
-
-  /**
    * Handles the WebSocket connection event. This method retrieves the device ID from the connection
    * context's cookies, decrypts it, and adds the device and its associated WebSocket context to the
    * session map.
    */
   @Override
   public void handleConnect(@NotNull WsConnectContext wsCnt) throws Exception {
-    LOGGER.info("client connected");
+    LOGGER.info("Device connected");
     String str_code = wsCnt.cookie("code");
 
     if (str_code == null) {
-      // wsCnt.closeSession();
+      LOGGER.info("Device is missing a cookie");
+      wsCnt.closeSession();
       return;
     }
     // Get the device ID from the repository
-    SimpleDevice device = deviceRepo.getDeviceByID(str_code);
+    BaseDevice device = deviceRepo.getDeviceByID(str_code);
     if (device == null) {
       // Close connection if device is not present
-      // wsCnt.closeSession();
-      return;
+      wsCnt.closeSession();
+    } else {
+      // Add device to the active ones
+      sessionMap.add(device, wsCnt);
     }
-    sessionMap.add(device, wsCnt);
   }
+
+
 
   @Override
   public void handleClose(@NotNull WsCloseContext wsCls) {
@@ -95,43 +85,5 @@ public class WSDeviceHandler
     }
   }
 
-  /**
-   * MirroredSession - A class that manages the mapping between device IDs and their associated
-   * WebSocket contexts. It provides methods to add, remove, and retrieve devices and their contexts
-   * based on device ID or session ID.
-   */
-  private static class MirroredSession {
-    HashMap<String, Pair<SimpleDevice, WsContext>> activeSessions = new HashMap<>();
-    HashMap<String, Pair<SimpleDevice, WsContext>> mirrorActiveSession = new HashMap<>();
 
-    /**
-     * Adds a device and its associated WebSocket context to the session map.
-     *
-     * @param device The SimpleDevice object to be added.
-     * @param context The WebSocket context associated with the device.
-     */
-    private void add(@NotNull SimpleDevice device, WsContext context) {
-      var pair = new Pair<>(device, context);
-      activeSessions.put(device.getId(), pair);
-      mirrorActiveSession.put(context.sessionId(), pair);
-    }
-
-    private void removeBySessionID(String session_id) {
-      String device_id = mirrorActiveSession.remove(session_id).component1().getId();
-      activeSessions.remove(device_id);
-    }
-
-    private void removeByDeviceID(String device_id) {
-      String session_id = activeSessions.remove(device_id).component1().getId();
-      mirrorActiveSession.remove(session_id);
-    }
-
-    private Pair<SimpleDevice, WsContext> getByDeviceID(String device_id) {
-      return activeSessions.get(device_id);
-    }
-
-    private Pair<SimpleDevice, WsContext> getBySessionID(String session_id) {
-      return mirrorActiveSession.get(session_id);
-    }
-  }
 }

@@ -22,17 +22,7 @@ public class AESTools {
       new LazySodiumJava(new SodiumJava(LibraryLoader.Mode.PREFER_SYSTEM));
 
   public static String encryptFromByteToBase64(byte[] data, @NotNull byte[] key) {
-    byte[] nonce = LS.nonce(AEAD.CHACHA20POLY1305_IETF_NPUBBYTES);
-    byte[] encrypted_msg = new byte[data.length + AEAD.CHACHA20POLY1305_IETF_ABYTES];
-    long[] length = new long[1];
-
-    LS.cryptoAeadChaCha20Poly1305IetfEncrypt(
-        encrypted_msg, length, data, data.length, null, 0, null, nonce, key);
-
-    byte[] full_msg = new byte[encrypted_msg.length + nonce.length];
-    System.arraycopy(encrypted_msg, 0, full_msg, 0, encrypted_msg.length);
-    System.arraycopy(nonce, 0, full_msg, encrypted_msg.length, nonce.length);
-    return Base64.getEncoder().encodeToString(full_msg);
+    return Base64.getEncoder().encodeToString(encryptFromByteToByte(data, key));
   }
 
   public static byte[] decryptFromBase64ToByte(String data, @NotNull byte[] key)
@@ -63,6 +53,20 @@ public class AESTools {
       throw new SodiumException("Error while decrypting...");
     }
     return plain_msg;
+  }
+
+  public static byte[] encryptFromByteToByte(byte[] data, @NotNull byte[] key) {
+    byte[] nonce = LS.nonce(AEAD.CHACHA20POLY1305_IETF_NPUBBYTES);
+    byte[] encrypted_msg = new byte[data.length + AEAD.CHACHA20POLY1305_IETF_ABYTES];
+    long[] length = new long[1];
+
+    LS.cryptoAeadChaCha20Poly1305IetfEncrypt(
+        encrypted_msg, length, data, data.length, null, 0, null, nonce, key);
+
+    byte[] full_msg = new byte[encrypted_msg.length + nonce.length];
+    System.arraycopy(encrypted_msg, 0, full_msg, 0, encrypted_msg.length);
+    System.arraycopy(nonce, 0, full_msg, encrypted_msg.length, nonce.length);
+    return full_msg;
   }
 
   public static byte[] generatePrivateKey() {

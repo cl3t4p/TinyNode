@@ -2,6 +2,7 @@ package com.cl3t4p.TinyNode.db;
 
 import com.cl3t4p.TinyNode.config.ConfigManager;
 import com.cl3t4p.TinyNode.db.impl.DeviceRepoSQLite;
+import com.cl3t4p.TinyNode.tools.MirroredSession;
 import java.sql.SQLException;
 import lombok.Getter;
 
@@ -15,6 +16,8 @@ public class RepoManager {
 
   @Getter private final DeviceRepo deviceRepo;
 
+  @Getter private final MirroredSession deviceSessionsMap;
+
   private RepoManager() throws SQLException {
     var config = ConfigManager.getInstance().getConfig().getDb();
     switch (config.db_type()) {
@@ -23,6 +26,8 @@ public class RepoManager {
       }
       default -> throw new RuntimeException("Unknown database type");
     }
+
+    deviceSessionsMap = new MirroredSession();
   }
 
   public static void init() throws SQLException {

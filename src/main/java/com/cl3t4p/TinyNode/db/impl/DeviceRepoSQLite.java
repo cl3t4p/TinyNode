@@ -2,7 +2,7 @@ package com.cl3t4p.TinyNode.db.impl;
 
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.mapper.SQLMapper;
-import com.cl3t4p.TinyNode.model.SimpleDevice;
+import com.cl3t4p.TinyNode.model.BaseDevice;
 import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.HashSet;
@@ -42,15 +42,13 @@ public class DeviceRepoSQLite implements DeviceRepo {
         return conn;
     }
 
-
-
-    @Override
-    public SimpleDevice getDeviceByID(String id) throws SQLException {
+  @Override
+  public BaseDevice getDeviceByID(String id) throws SQLException {
         try(var conn = getConnection()){
             var statement = conn.prepareStatement("SELECT * FROM `devices` WHERE id=?");
             statement.setString(1,id);
             var resultSet = statement.executeQuery();
-            return SQLMapper.deserializeSQL(resultSet,SimpleDevice.class);
+      return SQLMapper.deserializeSQL(resultSet, BaseDevice.class);
         }
     }
     @Override
@@ -66,8 +64,8 @@ public class DeviceRepoSQLite implements DeviceRepo {
         }
     }
 
-    @Override
-    public boolean addDevice(SimpleDevice device) throws SQLException {
+  @Override
+  public boolean addDevice(BaseDevice device) throws SQLException {
         try(var conn = getConnection()){
       var statement =
           conn.prepareStatement("INSERT INTO `devices` (id,private_key,name) VALUES (?,?,?)");
@@ -88,15 +86,15 @@ public class DeviceRepoSQLite implements DeviceRepo {
         }
     }
 
-    @Override
-    public Set<SimpleDevice> getAllDevices() throws SQLException {
-        Set<SimpleDevice> devices = new HashSet<>();
+  @Override
+  public Set<BaseDevice> getAllDevices() throws SQLException {
+    Set<BaseDevice> devices = new HashSet<>();
         try(var conn = getConnection()){
             var statement = conn.prepareStatement("SELECT * FROM `devices`");
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()){
-                SimpleDevice device = SQLMapper.deserializeSQL(resultSet,SimpleDevice.class);
+        BaseDevice device = SQLMapper.deserializeSQL(resultSet, BaseDevice.class);
                 devices.add(device);
             }
 

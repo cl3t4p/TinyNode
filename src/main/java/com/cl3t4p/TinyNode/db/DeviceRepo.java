@@ -1,6 +1,6 @@
 package com.cl3t4p.TinyNode.db;
 
-import com.cl3t4p.TinyNode.model.SimpleDevice;
+import com.cl3t4p.TinyNode.model.BaseDevice;
 import java.sql.SQLException;
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public interface DeviceRepo {
    * @return true if the device was added successfully, false otherwise.
    * @throws SQLException If an SQL error occurs during the operation.
    */
-  boolean addDevice(SimpleDevice device) throws SQLException;
+  boolean addDevice(BaseDevice device) throws SQLException;
 
   /**
    * Modifies the name of a device in the database.
@@ -47,7 +47,7 @@ public interface DeviceRepo {
    * @return The SimpleDevice object if found, null otherwise.
    * @throws SQLException If an SQL error occurs during the operation.
    */
-  SimpleDevice getDeviceByID(String id) throws SQLException;
+  BaseDevice getDeviceByID(String id) throws SQLException;
 
   /**
    * Retrieves all devices from the database.
@@ -55,5 +55,5 @@ public interface DeviceRepo {
    * @return A set of SimpleDevice objects representing all devices in the database.
    * @throws SQLException If an SQL error occurs during the operation.
    */
-  Set<SimpleDevice> getAllDevices() throws SQLException;
+  Set<BaseDevice> getAllDevices() throws SQLException;
 }
