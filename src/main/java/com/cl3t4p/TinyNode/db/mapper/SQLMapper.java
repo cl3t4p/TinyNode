@@ -59,12 +59,14 @@ public class SQLMapper {
       object = clazz.getDeclaredConstructor().newInstance();
       for (Field field : object.getClass().getDeclaredFields()) {
         String name = field.getName();
-        boolean ignore = false;
+        boolean ignore = true;
 
         for (Annotation annotation : field.getAnnotations())
           if (annotation instanceof SQLDInfo info) {
             name = info.sql_name().isEmpty() ? name : info.sql_name();
             ignore = info.ignore();
+            break;
+          } else {
             break;
           }
         if (ignore) continue;
@@ -82,4 +84,6 @@ public class SQLMapper {
 
     return object;
   }
+
+
 }

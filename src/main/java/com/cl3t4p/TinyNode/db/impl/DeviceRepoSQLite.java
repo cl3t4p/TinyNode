@@ -3,7 +3,6 @@ package com.cl3t4p.TinyNode.db.impl;
 import com.cl3t4p.TinyNode.db.DeviceRepo;
 import com.cl3t4p.TinyNode.db.mapper.SQLMapper;
 import com.cl3t4p.TinyNode.model.BaseDevice;
-import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.List;
@@ -51,19 +50,26 @@ public class DeviceRepoSQLite implements DeviceRepo {
       return SQLMapper.deserializeSQL(resultSet, BaseDevice.class);
         }
     }
-    @Override
-    public boolean addDevice(String id,byte[] key) throws SQLException{
+
+  @Override
+  public boolean addDevice(String id, String name, byte[] key) throws SQLException {
         try(var conn = getConnection()){
       var statement =
           conn.prepareStatement("INSERT INTO `devices` (id,private_key,name) VALUES (?,?,?)");
             statement.setString(1,id);
-            statement.setBlob(2,new ByteArrayInputStream(key));
-            statement.setString(3,id);
+
+      if (key == null || key.length != 32) {
+        throw new IllegalArgumentException("private_key must be 32 bytes");
+      }
+      statement.setBytes(2, key);
+
+      statement.setString(3, name);
             int result = statement.executeUpdate();
             return result == 1;
         }
     }
 
+  // TODO FIX this
   @Override
   public boolean addDevice(BaseDevice device) throws SQLException {
         try(var conn = getConnection()){

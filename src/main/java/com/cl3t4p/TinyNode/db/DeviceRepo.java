@@ -14,12 +14,13 @@ public interface DeviceRepo {
    * Adds a device to the database.
    *
    * @param id The ID of the device.
+   * @param name Name of the device
    * @param key The AES key of the device.
    * @return true if the device was added successfully, false otherwise. The device name is set to
    *     its ID by default.
    * @throws SQLException If an SQL error occurs during the operation.
    */
-  boolean addDevice(String id, byte[] key) throws SQLException;
+  boolean addDevice(String id, String name, byte[] key) throws SQLException;
 
   /**
    * Adds a device to the database.

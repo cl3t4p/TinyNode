@@ -53,7 +53,8 @@ public class WSDeviceHandler
     BaseDevice device = deviceRepo.getDeviceByID(str_code);
     if (device == null) {
       // Close connection if device is not present
-      wsCnt.closeSession();
+      LOGGER.info("Device not found with code {}", str_code);
+      wsCnt.closeSession(WsCloseStatus.NORMAL_CLOSURE, "Device not found");
     } else {
       // Add device to the active ones
       sessionMap.add(device, wsCnt);
@@ -64,9 +65,8 @@ public class WSDeviceHandler
 
   @Override
   public void handleClose(@NotNull WsCloseContext wsCls) {
-    LOGGER.info(
-        "Device {} disconnected!",
-        sessionMap.getBySessionID(wsCls.sessionId()).component1().getId());
+    LOGGER.info("Device disconnected!");
+    // sessionMap.getBySessionID(wsCls.sessionId()).component1().getId());
     sessionMap.removeBySessionID(wsCls.sessionId());
   }
 
@@ -77,9 +77,7 @@ public class WSDeviceHandler
   public void handleError(@NotNull WsErrorContext wsErrorContext) {
     assert wsErrorContext.error() != null;
     if (wsErrorContext.error().getClass().equals(ClosedChannelException.class)) {
-      LOGGER.warn(
-          "Device {} aborted connection!",
-          sessionMap.getBySessionID(wsErrorContext.sessionId()).component1().getId());
+      LOGGER.warn("Device aborted connection!");
     } else {
       LOGGER.error("Websocket error : ", wsErrorContext.error());
     }

@@ -2,6 +2,7 @@ package com.cl3t4p.TinyNode;
 
 import com.cl3t4p.TinyNode.config.ConfigManager;
 import com.cl3t4p.TinyNode.db.RepoManager;
+import com.cl3t4p.TinyNode.model.BaseDevice;
 import com.cl3t4p.TinyNode.routes.APIHandler;
 import com.cl3t4p.TinyNode.routes.api.IPHandler;
 import io.javalin.Javalin;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Base64;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.simple.SimpleLoggerFactory;
 
@@ -63,6 +65,7 @@ public class TinyNode {
       throw new RuntimeException(e);
     }
 
+
     app =
         Javalin.create(
             config -> {
@@ -74,9 +77,22 @@ public class TinyNode {
               config.jetty.defaultHost = cfgManager.getConfig().getIp();
             });
 
-    //TODO Remove after testing
-    //app.error(404,ctx -> ctx.result(""));
+    // TODO Remove after testing
+    // app.error(500,ctx -> ctx.result(""));
 
     app.start(cfgManager.getConfig().getPort());
+  }
+
+  @SneakyThrows
+  private static void add_device() {
+    BaseDevice device = new BaseDevice();
+    device.setId("80F3DA41139C");
+    device.setName("Testing_Node");
+    device.setPrivate_key(
+        Base64.getDecoder().decode("HYeu2i6jCci64w92/OC2KpOX385MXzi4TxgXOkt+Xy0="));
+    System.out.println(device.getPrivate_key().length);
+    RepoManager.getInstance()
+        .getDeviceRepo()
+        .addDevice(device.getId(), device.getName(), device.getPrivate_key());
   }
 }

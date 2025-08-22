@@ -27,7 +27,7 @@ public class CommandHandler implements Handler {
     }
     var pair = deviceMirroredSession.getByDeviceID(device_id);
     if (pair == null) {
-      ctx.status(404);
+      deviceMirroredSession.addQueueCommandRequest(cmd_request, device_id);
       return;
     }
     byte[] encrypted_request = pair.component1().encryptCommandRequest(cmd_request);

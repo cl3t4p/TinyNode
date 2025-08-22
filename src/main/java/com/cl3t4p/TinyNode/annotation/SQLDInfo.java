@@ -10,5 +10,5 @@ public @interface SQLDInfo {
 
   String sql_name() default "";
 
-  boolean ignore() default false;
+  boolean ignore() default true;
 }

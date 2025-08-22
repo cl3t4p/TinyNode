@@ -1,5 +1,6 @@
 package com.cl3t4p.TinyNode.model;
 
+import com.cl3t4p.TinyNode.annotation.SQLDInfo;
 import com.cl3t4p.TinyNode.tools.AESTools;
 import com.goterl.lazysodium.exceptions.SodiumException;
 import java.nio.ByteBuffer;
@@ -15,9 +16,9 @@ public class BaseDevice implements CommandReciver {
   private static final int BASE_PACKET_SIZE = 4 + 16;
   private static final int VERSION = 1;
 
-  private String id;
-  private String name;
-  private byte[] private_key;
+  @SQLDInfo private String id;
+  @SQLDInfo private String name;
+  @SQLDInfo private byte[] private_key;
 
   public BaseDevice(String id) {
     this.id = id;
