@@ -34,7 +34,6 @@ public class TinyNode {
 
   public static void main(String[] args) {
 
-
     // Setup folders
     if (!CONFIG_FOLDER.exists()) {
       CONFIG_FOLDER.mkdirs();
@@ -64,7 +63,6 @@ public class TinyNode {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-
 
     app =
         Javalin.create(

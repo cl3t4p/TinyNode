@@ -30,7 +30,6 @@ public class WebSocketTest {
   public void testWebSocketEcho() throws Exception {
     CompletableFuture<String> receivedMessage = new CompletableFuture<>();
 
-
     String mac_address = "5cb6037f7fa6";
     HttpClient client = HttpClient.newHttpClient();
     var bao = ByteBuffer.allocate(6 + Long.BYTES);
@@ -48,7 +47,6 @@ public class WebSocketTest {
                 URI.create("ws://localhost:7070" + API_BASE_PATH + "/device/com"),
                 new WebSocket.Listener() {})
             .join();
-
 
     var stat = webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "");
     stat.join();

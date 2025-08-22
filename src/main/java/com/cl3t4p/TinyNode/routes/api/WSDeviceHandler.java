@@ -20,11 +20,9 @@ public class WSDeviceHandler
   private static final MirroredSession sessionMap =
       RepoManager.getInstance().getDeviceSessionsMap();
 
-  @Getter
-  private static WSDeviceHandler instance;
+  @Getter private static WSDeviceHandler instance;
 
   private final DeviceRepo deviceRepo = RepoManager.getInstance().getDeviceRepo();
-
 
   public static void getEndpoints(WsConfig wsConfig) {
     instance = new WSDeviceHandler();
@@ -61,8 +59,6 @@ public class WSDeviceHandler
     }
   }
 
-
-
   @Override
   public void handleClose(@NotNull WsCloseContext wsCls) {
     LOGGER.info("Device disconnected!");
@@ -82,6 +78,4 @@ public class WSDeviceHandler
       LOGGER.error("Websocket error : ", wsErrorContext.error());
     }
   }
-
-
 }
