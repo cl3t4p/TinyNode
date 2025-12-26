@@ -55,6 +55,7 @@ public class WSDeviceHandler
       wsCnt.closeSession(WsCloseStatus.NORMAL_CLOSURE, "Device not found");
     } else {
       // Add device to the active ones
+      LOGGER.info("Device found with code {}", str_code);
       sessionMap.add(device, wsCnt);
     }
   }

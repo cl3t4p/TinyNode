@@ -11,4 +11,5 @@ public class ConfigFile {
   String ip_grabber;
   String shared_key;
   DatabaseConfig db;
+  SSLConfig ssl;
 }

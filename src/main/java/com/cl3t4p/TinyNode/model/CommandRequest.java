@@ -1,5 +1,6 @@
 package com.cl3t4p.TinyNode.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 public class CommandRequest {
   private String deviceId;
   private CommandType command;
+  @JsonAlias("command_data")
   private String commandData;
 
   int calculateByteSize() {

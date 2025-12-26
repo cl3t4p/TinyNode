@@ -21,11 +21,11 @@ public class APIHandler {
                   "/device",
                   () -> {
                     get(
-                        "/com/devices",
+                        "/all",
                         ctx -> ctx.json(RepoManager.getInstance().getDeviceRepo().getAllDevices()));
                     ws("/com", WSDeviceHandler::getEndpoints);
-                    post("/command", new CommandHandler());
                   });
+                post("/command", new CommandHandler());
             });
   }
 }

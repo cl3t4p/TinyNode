@@ -1,0 +1,19 @@
+@host = 192.168.1.200
+@port = 7002
+@baseUrl = http://{{host}}:{{port}}
+
+### Health
+GET {{baseUrl}}/info
+
+### Get all the active devices
+GET {{baseUrl}}/api/v01/device/all
+
+### Send command (edit path if yours differs)
+POST {{baseUrl}}/api/v01/command
+Content-Type: application/json
+
+{
+  "deviceId": "841FE817C5A4",
+  "command": "ON",
+  "command_data" : "ON"
+}

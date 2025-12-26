@@ -6,5 +6,10 @@
   "db": {
     "db_type": "SQLite",
     "url": "jdbc:sqlite:data/sqlite.db"
+  },
+  "ssl" : {
+    "enable" : true,
+    "keystore_path": "config/keystore.p12",
+    "keystore_password": "password"
   }
 }

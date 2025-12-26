@@ -1,1 +1,1 @@
-keytool -genkeypair -alias javalin-cert -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass password -keypass password -dname "CN=192.168.1.36"
+keytool -genkeypair -alias javalin-cert -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass password -keypass password -dname "CN=192.168.1.42"

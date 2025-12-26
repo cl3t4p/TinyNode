@@ -47,7 +47,14 @@ public class DeviceRepoSQLite implements DeviceRepo {
       var statement = conn.prepareStatement("SELECT * FROM `devices` WHERE id=?");
       statement.setString(1, id);
       var resultSet = statement.executeQuery();
-      return SQLMapper.deserializeSQL(resultSet, BaseDevice.class);
+      BaseDevice baseDevice = new BaseDevice(id);
+      if (resultSet.next()) {
+          baseDevice.setId(resultSet.getString("id"));
+          baseDevice.setName(resultSet.getString("name"));
+          baseDevice.setPrivate_key(resultSet.getBytes("private_key"));
+          return baseDevice;
+      }else return null;
+      //return SQLMapper.deserializeSQL(resultSet, BaseDevice.class);
     }
   }
 

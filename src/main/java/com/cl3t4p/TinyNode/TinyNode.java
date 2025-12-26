@@ -1,5 +1,14 @@
 package com.cl3t4p.TinyNode;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+
 import com.cl3t4p.TinyNode.config.ConfigManager;
 import com.cl3t4p.TinyNode.db.RepoManager;
 import com.cl3t4p.TinyNode.model.BaseDevice;
@@ -73,18 +82,49 @@ public class TinyNode {
                     ApiBuilder.get("/info", ctx -> ctx.result("hello"));
                   });
               config.jetty.defaultHost = cfgManager.getConfig().getIp();
+              if(cfgManager.getConfig().getSsl().enable()){
+                  final String ksPath = cfgManager.getConfig().getSsl().keystore_path();
+                  final String ksPass = cfgManager.getConfig().getSsl().keystore_password();
+                  final int httpsPort = cfgManager.getConfig().getPort();
+
+
+
+                  config.jetty.modifyServer((server) -> {
+
+                      SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+                      sslContextFactory.setKeyStorePath(ksPath);
+                      sslContextFactory.setKeyStorePassword(ksPass);
+                      sslContextFactory.setKeyStoreType("PKCS12");
+                      sslContextFactory.setSniRequired(false);
+
+                      HttpConfiguration https = new HttpConfiguration();
+                      https.addCustomizer(new SecureRequestCustomizer());
+
+                      ServerConnector sslConnector =
+                              new ServerConnector(
+                                      server,
+                                      new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                                      new HttpConnectionFactory(https)
+                              );
+                      sslConnector.setPort(httpsPort);
+
+                      server.addConnector(sslConnector);
+                  });
+
+              }
+
             });
 
     // TODO Remove after testing
     // app.error(500,ctx -> ctx.result(""));
-
     app.start(cfgManager.getConfig().getPort());
   }
 
   @SneakyThrows
   private static void add_device() {
     BaseDevice device = new BaseDevice();
-    device.setId("80F3DA41139C");
+    device.setId("841FE817C5A4");
+    //device.setId("80F3DA41139C");
     device.setName("Testing_Node");
     device.setPrivate_key(
         Base64.getDecoder().decode("HYeu2i6jCci64w92/OC2KpOX385MXzi4TxgXOkt+Xy0="));
